@@ -41,6 +41,9 @@ private:
 	float m_acceleration;
 	float m_maxSpeed;
 
+	float m_rotationSpeed = 3.0f;
+	bool m_rightButtonDown = false;
+
 };
 
 #endif

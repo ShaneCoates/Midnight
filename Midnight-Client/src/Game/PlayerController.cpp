@@ -5,6 +5,7 @@
 #include "glfw/glfw3.h"
 #include "glm/ext.hpp"
 #include "aieutilities/Gizmos.h"
+#include "Utilities/Debug.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -56,11 +57,21 @@ void PlayerController::Draw(Camera * _camera)
 
 void PlayerController::UpdateInput(double _dt)
 {
-	double x, y;
-	glfwGetCursorPos(m_window, &x, &y);
-	glm::vec2 mousePos = glm::vec2(x - (Game::k_windowWidth * 0.5f), y - (Game::k_windowHeight * 0.5f));
-	mousePos = glm::normalize(mousePos);
-	m_rotation = atan2(mousePos.x, mousePos.y) + M_PI;
+	bool rightButtonDown = glfwGetMouseButton(m_window, 1);
+	if(rightButtonDown)
+	{
+		if(m_rightButtonDown)
+		{
+			double x, y;
+			glfwGetCursorPos(m_window, &x, &y);
+			glm::vec2 mousePos = glm::vec2(x - (Game::k_windowWidth * 0.5f), y - (Game::k_windowHeight * 0.5f));
+			m_rotation -= glm::radians(mousePos.x * m_rotationSpeed * _dt);
+		}
+		glfwSetCursorPos(m_window, Game::k_windowWidth * 0.5f, Game::k_windowHeight * 0.5f);
+	}
+
+	m_rightButtonDown = rightButtonDown;
+	glfwSetInputMode(m_window, GLFW_CURSOR, m_rightButtonDown ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
 
 	m_velocity -= m_velocity * (m_friction * (float)_dt); //friction
 
@@ -89,7 +100,14 @@ void PlayerController::UpdateInput(double _dt)
 		m_velocity = glm::normalize(m_velocity) * m_maxSpeed;
 	}
 
-	m_position += ((float)_dt * m_velocity);
+	glm::mat4 trans(1);
+	trans = glm::translate(trans, m_position);
+
+	trans = glm::rotate(trans, m_rotation, glm::vec3(0, 1, 0));
+
+	trans = glm::translate(trans, m_velocity * _dt);
+
+	m_position = trans[3].xyz;
 
 	if(m_position.x > 8.5f)
 	{

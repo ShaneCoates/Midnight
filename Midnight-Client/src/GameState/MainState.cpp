@@ -47,10 +47,17 @@ void MainState::Update(double _dt)
 
 	m_player->Update(_dt);
 	m_arenaRenderer->UpdatePlayer(0, m_player->GetPlayerPositionAndRotation(), m_player->GetPlayerData());
-	glm::vec3 playerPos = m_player->GetPlayerPositionAndRotation().xyz;
+
+	glm::vec4 playerPos = m_player->GetPlayerPositionAndRotation();
+
+	glm::mat4 trans(1);
+	trans = glm::rotate(trans, playerPos.w, glm::vec3(0, 1, 0));
+
+	trans = glm::translate(trans, glm::vec3(0.0f, 1.5f, -2.0f));
+
 	playerPos.y = 0.5f;
-	m_followCamera->UpdatePosition(playerPos, glm::vec3(0, 0.2f, 0));
-	
+
+	m_followCamera->SetLookAt(trans[3].xyz + playerPos.xyz, playerPos.xyz + glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0));
 	
 	DrawGUI();
 }
