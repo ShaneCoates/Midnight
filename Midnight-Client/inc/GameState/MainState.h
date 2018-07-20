@@ -52,7 +52,7 @@ private:
 	int m_ImGuiWindowFlag = 0;
 	bool m_ImGuiWindowOpen = true;
 
-	float m_time = 0;
+	double m_time = 0;
 
 	glm::vec3 m_playerPos = glm::vec3(2, 0.5f, 2);
 	

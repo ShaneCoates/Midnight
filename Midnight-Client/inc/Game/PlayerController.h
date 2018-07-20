@@ -34,7 +34,7 @@ private:
 	glm::vec3 m_position;
 	float m_rotation;
 	glm::vec4 m_miscData;
-	float m_timeSinceSpawn = 0.0f;
+	double m_timeSinceSpawn = 0.0f;
 
 	//cache some game rules
 	float m_friction;

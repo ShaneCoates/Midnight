@@ -43,11 +43,9 @@ private:
 	unsigned int m_shadersUsed = 0;
 	unsigned int m_shaderIDs[MaterialShaders::MAX];
 
-
 	unsigned int m_materialID;
 	unsigned int m_vao;
 	unsigned int m_vbo;
-
 	
 	std::map<const char*, unsigned int> m_attribLocations;
 	std::map<const char*, unsigned int> m_uniformLocations;

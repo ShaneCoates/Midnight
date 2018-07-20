@@ -4,12 +4,17 @@ smooth in vec2 TexCoord;
 
 out vec4 outColor;
 
+//Raymarching shader using custom defined Signed Distance fields
+//A lot of what we do in here is referencing iq, either from http://iquilezles.org/www/articles/distfunctions/distfunctions.htm or from https://www.shadertoy.com/view/Xds3zNcom
+
+//struct with dist and an index so we can compare distance fields and retain the color of the object
 struct DistObjectIndexPair
 {
 	float dist;
 	int colorIndex;
 };
 
+//colors of objects we may hit - hardcoded for now
 vec4[3] m_objectColors = vec4[3](
 	vec4(0.75f, 0.25f, 0.25f, 1), //WALL
 	vec4(135.0f / 255.0f, 179.0f / 255.0f, 122.0f / 255.0f, 1), //PLAYER
@@ -40,8 +45,6 @@ uniform vec4 m_directionalLightColor;
 uniform vec3 m_pointLightPos;
 uniform vec4 m_pointLightColor;
 
-uniform float m_time;
-
 //Players
 uniform vec4 m_player1Pos;
 uniform vec4 m_player1Data;
@@ -49,6 +52,38 @@ uniform vec4 m_player1Data;
 //Debug options
 uniform int m_MSAA;
 uniform int m_AO;
+
+//matrix maths, ref: iq @ https://www.shadertoy.com/view/llsXRX
+mat4 matRotate( in vec3 xyz )
+{
+    vec3 si = sin(xyz);
+    vec3 co = cos(xyz);
+
+	return mat4( co.y*co.z,                co.y*si.z,               -si.y,       0.0,
+                 si.x*si.y*co.z-co.x*si.z, si.x*si.y*si.z+co.x*co.z, si.x*co.y,  0.0,
+                 co.x*si.y*co.z+si.x*si.z, co.x*si.y*si.z-si.x*co.z, co.x*co.y,  0.0,
+			     0.0,                      0.0,                      0.0,        1.0 );
+}
+
+mat4 matTranslate( float x, float y, float z )
+{
+    return mat4( 1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 x,   y,   z,   1.0 );
+}
+
+mat4 matInverse( in mat4 m )
+{
+	return mat4(
+        m[0][0], m[1][0], m[2][0], 0.0,
+        m[0][1], m[1][1], m[2][1], 0.0,
+        m[0][2], m[1][2], m[2][2], 0.0,
+        -dot(m[0].xyz,m[3].xyz),
+        -dot(m[1].xyz,m[3].xyz),
+        -dot(m[2].xyz,m[3].xyz),
+        1.0 );
+}
 
 // Rotates a point t radians around the y-axis
 vec3 rotateY(vec3 v, float t)
@@ -98,44 +133,14 @@ float opSubtract(float d0, float d1)
 	return max(d0, -d1);
 }
 
-mat4 matRotate( in vec3 xyz )
-{
-    vec3 si = sin(xyz);
-    vec3 co = cos(xyz);
 
-	return mat4( co.y*co.z,                co.y*si.z,               -si.y,       0.0,
-                 si.x*si.y*co.z-co.x*si.z, si.x*si.y*si.z+co.x*co.z, si.x*co.y,  0.0,
-                 co.x*si.y*co.z+si.x*si.z, co.x*si.y*si.z-si.x*co.z, co.x*co.y,  0.0,
-			     0.0,                      0.0,                      0.0,        1.0 );
-}
-
-mat4 matTranslate( float x, float y, float z )
-{
-    return mat4( 1.0, 0.0, 0.0, 0.0,
-				 0.0, 1.0, 0.0, 0.0,
-				 0.0, 0.0, 1.0, 0.0,
-				 x,   y,   z,   1.0 );
-}
-
-mat4 matInverse( in mat4 m )
-{
-	return mat4(
-        m[0][0], m[1][0], m[2][0], 0.0,
-        m[0][1], m[1][1], m[2][1], 0.0,
-        m[0][2], m[1][2], m[2][2], 0.0,
-        -dot(m[0].xyz,m[3].xyz),
-        -dot(m[1].xyz,m[3].xyz),
-        -dot(m[2].xyz,m[3].xyz),
-        1.0 );
-}
-
+//defines a union between two distance fields
 DistObjectIndexPair opU(DistObjectIndexPair d1, DistObjectIndexPair d2)
 {
 	return d1.dist < d2.dist ? d1 : d2;
 }
 
-
-
+//Defines the distance field of a player and its "guns"
 DistObjectIndexPair distPlayer(vec3 p, vec3 playerPos, float playerRot)
 {
 	mat4 rot = matRotate(vec3(0.0f, playerRot, 0.0f));
@@ -156,17 +161,16 @@ DistObjectIndexPair distPlayer(vec3 p, vec3 playerPos, float playerRot)
 }
 
 
-
+//wall definitions - hardcoded for now
 vec3 outerWall = vec3(10f, 0.5f, 10f);
 vec3 innerWall = vec3(9f, 1f, 9f);
+
 // Defines the distance field for the scene
 DistObjectIndexPair distScene(vec3 p)
 {
 	//Walls
 	vec3 wallPos = p - vec3(0f, 0.25f, 0f);
 	DistObjectIndexPair dist = DistObjectIndexPair(opSubtract(sdBox(wallPos, outerWall), sdBox(wallPos, innerWall)), 0);
-
-	//dist = opU(dist, DistObjectIndexPair(sdBox(wallPos, vec3(1f, 0.5f, 1f)), 0));
 
 	//Fake player
 	dist = opU(dist, distPlayer(p, vec3(m_player1Pos.xyz), m_player1Pos.w));
@@ -176,8 +180,6 @@ DistObjectIndexPair distScene(vec3 p)
 	//dist = min(dist, distPlayer(p, vec3(sin(m_time), 0.1f, 0), m_time));
 
 	//dist = min(dist, distPlayer(p, vec3(sin(m_time), 0.1f, -2), m_time));
-
-
 
 	return dist;
 }
@@ -321,6 +323,9 @@ float ambientOcclusion(vec3 p, vec3 n)
 	return clamp(oc, 0, 1);
 }
 
+//Calculate the color of a pixel
+// ro: ray origin
+// rd: ray direction
 vec4 computeColor(vec3 ro, vec3 rd)
 {
 	float t0;
@@ -377,19 +382,14 @@ vec4 computeColor(vec3 ro, vec3 rd)
 		color += (vec4(1, 0, 0, 1) * m_player1Data.z);
 	}
 
-	if(m_AO > 0)
-	{
-		// Blend in ambient occlusion factor
-		float ao = ambientOcclusion(p, normal);
-		color = color * (1.0f - ao);
-	}
+	// Blend in ambient occlusion factor
+	color = color * (m_AO == 1 ? (1.0f - ambientOcclusion(p, normal)) : 1);
 
 	// Blend the background color based on the distance from the camera
 	float zSqrd = z * z;
 	color = mix(m_skyColor, color, zSqrd * (3.0f - 2.0f * z)); // Fog
 
 	return color;
-
 }
 
 void main()
@@ -416,8 +416,3 @@ void main()
 	}
 	outColor = vec4(color.xyz, 1.0f);
 }
-
-//void main()
-//{
-//	outColor = vec4(texture(tex, TexCoord));
-//}

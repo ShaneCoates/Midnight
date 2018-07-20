@@ -23,14 +23,13 @@ private:
 
 	void UpdateMaterial();
 
-
 	double m_time;
 
 	glm::vec4 m_playerPos[1];
 	glm::vec4 m_playerData[1];
 
 	class Material* m_material;
-	bool m_materialShouldUpdate = false;
+	bool m_materialShouldUpdate = true; //default to true so we make sure we hit everything first frame
 	
 	unsigned int m_programID;
 
