@@ -190,14 +190,6 @@ float raytraceFloor(vec3 ro, vec3 rd, vec3 n, vec3 o)
 	return dot(o - ro, n) / dot(rd, n);
 }
 
-// Create a checkboard texture
-vec4 getFloorTexture(vec3 p)
-{
-return vec4(0.1f);
-	vec2 m = mod(p.xz, 2.0f) - vec2(1.0f);
-	return m.x * m.y > 0.0f ? vec4(0.1f) : vec4(1.0f);
-}
-
 // Calcs intersection and exit distances, and normal at intersection
 //
 // The box is axis aligned and at the origin, but has any size.
@@ -348,7 +340,7 @@ vec4 computeColor(vec3 ro, vec3 rd)
 		t = t1;
 		p = ro + rd * t1;
 		normal = floorNormal;
-		surfTexture = getFloorTexture(p);
+		surfTexture = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	}
 	else if(i < m_rmSteps && t0 >= m_zNear && t0 <= m_zFar) // Raymarching hit a surface
 	{

@@ -1,6 +1,7 @@
 #include "Rendering/Material.h"
 #include "Utilities/Utilities.h"
 #include "gl/gl_core_4_4.h"
+#include "glm/ext.hpp"
 
 Material::Material()
 {
@@ -63,14 +64,102 @@ unsigned int Material::CreateProgram()
 		delete[] infoLog;
 		return 0;
 	}
+	//Create buffer objects
+	glGenVertexArrays(1, &m_vao);
+	glGenBuffers(1, &m_vbo);
+
 	m_materialID = handle;
 	return handle;
 }
 
-void Material::Render()
+void Material::StartRender()
 {
+	glUseProgram(m_materialID);
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
 }
+
+void Material::SetVertices(const char* _property, GLsizeiptr _size, void* _vertices)
+{
+	glBufferData(GL_ARRAY_BUFFER, _size, _vertices, GL_STATIC_DRAW);
+
+	if(m_attribLocations.count(_property) == 0)
+	{
+		AddAttribLocation(_property);
+	}
+
+	glEnableVertexAttribArray(m_attribLocations[_property]);
+	glVertexAttribPointer(m_attribLocations[_property], 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+}
+
+void Material::SetMaterialUniformAttrib(const char* _attrib, int _value)
+{
+	if(m_uniformLocations.count(_attrib) == 0)
+	{
+		AddUniformLocation(_attrib);
+	}
+	glUniform1i(m_uniformLocations[_attrib], _value);
+}
+
+void Material::SetMaterialUniformAttrib(const char* _attrib, float _value)
+{
+	if(m_uniformLocations.count(_attrib) == 0)
+	{
+		AddUniformLocation(_attrib);
+	}
+	glUniform1f(m_uniformLocations[_attrib], _value);
+}
+
+void Material::SetMaterialUniformAttrib(const char* _attrib, glm::vec2 _value)
+{
+	if(m_uniformLocations.count(_attrib) == 0)
+	{
+		AddUniformLocation(_attrib);
+	}
+	glUniform2fv(m_uniformLocations[_attrib], 1, value_ptr(_value));
+	
+}
+
+void Material::SetMaterialUniformAttrib(const char* _attrib, glm::vec3 _value)
+{
+	if(m_uniformLocations.count(_attrib) == 0)
+	{
+		AddUniformLocation(_attrib);
+	}
+	glUniform3fv(m_uniformLocations[_attrib], 1, value_ptr(_value));
+
+}
+
+void Material::SetMaterialUniformAttrib(const char* _attrib, glm::vec4 _value)
+{
+	if(m_uniformLocations.count(_attrib) == 0)
+	{
+		AddUniformLocation(_attrib);
+	}
+	glUniform4fv(m_uniformLocations[_attrib], 1, value_ptr(_value));
+	
+}
+
+void Material::AddAttribLocation(const char* _attribName)
+{
+	unsigned int attribLoc = glGetAttribLocation(m_materialID, _attribName);
+	if(attribLoc != -1)
+	{
+		m_attribLocations[_attribName] = attribLoc;
+	}
+}
+
+void Material::AddUniformLocation(const char* _attribName)
+{
+	unsigned int attribLoc = glGetUniformLocation(m_materialID, _attribName);
+	if(attribLoc != -1)
+	{
+		m_uniformLocations[_attribName] = attribLoc;
+	}
+}
+
+
 
 unsigned int Material::GetGLShaderType(MaterialShaders _shaderType)
 {

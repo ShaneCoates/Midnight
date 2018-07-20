@@ -1,7 +1,6 @@
 #ifndef _ARENA_RENDERER_H_
 #define _ARENA_RENDERER_H_
 
-#include <map>
 #include "glm/glm.hpp"
 #include "gl/gl_core_4_4.h"
 
@@ -22,9 +21,6 @@ public:
 
 private:
 
-	void AddAttribLocation(const char* _attribName);
-	void AddUniformLocation(const char* _attribName);
-
 	void UpdateMaterial();
 
 
@@ -35,17 +31,9 @@ private:
 
 	class Material* m_material;
 	bool m_materialShouldUpdate = false;
-
-	//TODO:
-	//Not happy with this solution - unoptimised and leaves a lot of chance for human error
-	//Find a better, more robust solution. At least try const strings for param names
-	std::map<const char*, unsigned int> m_materialAttribLocations;
-	std::map<const char*, unsigned int> m_materialUniformLocations;
-
 	
 	unsigned int m_programID;
-	unsigned int m_vao;
-	unsigned int m_vbo;
+
 
 	GLfloat m_vertices[16] = {
 		-1.0f, -1.0f, 0.0f, 0.0f,
@@ -67,10 +55,10 @@ private:
 
 	glm::vec4 m_skyColor = glm::vec4(47.0f / 255.0f, 230.0f / 255.0f, 222.0f / 255.0f, 1.0f);
 	glm::vec4 m_ambient = glm::vec4(28.0f / 255.0f, 48.0f / 255.0f, 65.0f / 255.0f, 1.0f);
-	glm::vec3 m_light0Position = glm::normalize(glm::vec3(1.0f, -1.0f, -0.7f));
-	glm::vec4 m_light0Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	glm::vec3 m_light1Position = glm::vec3(0.0f, 2.0f, 0.0f);
-	glm::vec4 m_light1Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
+	glm::vec3 m_directionLightDir = glm::normalize(glm::vec3(1.0f, -1.0f, -0.7f));
+	glm::vec4 m_directionalLightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	glm::vec3 m_pointLightPosition = glm::vec3(0.0f, 2.0f, 0.0f);
+	glm::vec4 m_pointLightColor = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
 };
 
 #endif

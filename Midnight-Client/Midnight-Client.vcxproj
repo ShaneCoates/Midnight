@@ -158,6 +158,7 @@
     <ClCompile Include="src\GameState\LobbyState.cpp" />
     <ClCompile Include="src\GameState\MainState.cpp" />
     <ClCompile Include="src\Game\ArenaRenderer.cpp" />
+    <ClCompile Include="src\Game\ArenaRendererProperties.cpp" />
     <ClCompile Include="src\Game\PlayerController.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="inc\GameState\LobbyState.h" />
     <ClInclude Include="inc\GameState\MainState.h" />
     <ClInclude Include="inc\Game\ArenaRenderer.h" />
+    <ClInclude Include="inc\Game\ArenaRendererProperties.h" />
     <ClInclude Include="inc\Game\PlayerController.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
