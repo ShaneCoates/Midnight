@@ -48,6 +48,9 @@
     <ClCompile Include="src\Game\ArenaRendererProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Networking\NetworkManager_Client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Camera\Camera.h">
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Game\ArenaRendererProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Networking\NetworkManager_Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

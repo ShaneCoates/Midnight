@@ -43,7 +43,7 @@ Server::Server()
 		glfwTerminate();
 		return;
 	}
-	glfwSwapInterval(1); // Enable vsync
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
@@ -84,7 +84,7 @@ void Server::Run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		m_serverManager->Update();
+		m_serverManager->Update(dt);
 		m_serverManager->Draw();
 
 		ImGui::EndFrame();

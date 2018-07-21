@@ -6,6 +6,8 @@
 #include "glm/ext.hpp"
 #include "aieutilities/Gizmos.h"
 #include "Utilities/Debug.h"
+#include "Networking/NetworkManager_Client.h"
+#include "MessageIdentifiers.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -32,6 +34,10 @@ void PlayerController::Update(double _dt)
 	{
 		UpdateInput(_dt);
 	}
+
+	m_position = Game::GetNetworkManager()->m_playerInfo.position;
+	m_rotation = Game::GetNetworkManager()->m_playerInfo.rotation;
+
 	UpdateGunPositions(_dt);
 	UpdateFlashColor(_dt);
 }
@@ -65,7 +71,8 @@ void PlayerController::UpdateInput(double _dt)
 			double x, y;
 			glfwGetCursorPos(m_window, &x, &y);
 			glm::vec2 mousePos = glm::vec2(x - (Game::k_windowWidth * 0.5f), y - (Game::k_windowHeight * 0.5f));
-			m_rotation -= glm::radians(mousePos.x * m_rotationSpeed * _dt);
+			//m_rotation -= glm::radians(mousePos.x * m_rotationSpeed * _dt);
+			Game::GetNetworkManager()->SendInputStatus(ID_PLAYER_INPUT_ROTATION_DELTA, glm::radians(mousePos.x * m_rotationSpeed * _dt));
 		}
 		glfwSetCursorPos(m_window, Game::k_windowWidth * 0.5f, Game::k_windowHeight * 0.5f);
 	}
@@ -73,67 +80,39 @@ void PlayerController::UpdateInput(double _dt)
 	m_rightButtonDown = rightButtonDown;
 	glfwSetInputMode(m_window, GLFW_CURSOR, m_rightButtonDown ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
 
-	m_velocity -= m_velocity * (m_friction * (float)_dt); //friction
 
-	if(glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+	bool tempButtonDown = (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS);
+	bool tempCurrentState = (m_inputStates & (1 << GameRules::InputKeys::W));
+	if(tempButtonDown != tempCurrentState)
 	{
-		m_velocity.z += _dt * m_acceleration;
+		Game::GetNetworkManager()->SendInputStatus(tempButtonDown ? ID_PLAYER_INPUT_W_DOWN : ID_PLAYER_INPUT_W_UP);
+		m_inputStates ^= (1 << GameRules::InputKeys::W);
 	}
 
-	if(glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+	tempButtonDown = (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS);
+	tempCurrentState = (m_inputStates & (1 << GameRules::InputKeys::S));
+	if(tempButtonDown != tempCurrentState)
 	{
-		m_velocity.z -= _dt * m_acceleration;
+		Game::GetNetworkManager()->SendInputStatus(tempButtonDown ? ID_PLAYER_INPUT_S_DOWN : ID_PLAYER_INPUT_S_UP);
+		m_inputStates ^= (1 << GameRules::InputKeys::S);
 	}
 
-	if(glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+	 tempButtonDown = (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS);
+	 tempCurrentState = (m_inputStates & (1 << GameRules::InputKeys::A));
+	if(tempButtonDown != tempCurrentState)
 	{
-		m_velocity.x += _dt * m_acceleration;
+		Game::GetNetworkManager()->SendInputStatus(tempButtonDown ? ID_PLAYER_INPUT_A_DOWN : ID_PLAYER_INPUT_A_UP);
+		m_inputStates ^= (1 << GameRules::InputKeys::A);
 	}
 
-	if(glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+	 tempButtonDown = (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS);
+	 tempCurrentState = (m_inputStates & (1 << GameRules::InputKeys::D));
+	if(tempButtonDown != tempCurrentState)
 	{
-		m_velocity.x -= _dt * m_acceleration;
+		Game::GetNetworkManager()->SendInputStatus(tempButtonDown ? ID_PLAYER_INPUT_D_DOWN : ID_PLAYER_INPUT_D_UP);
+		m_inputStates ^= (1 << GameRules::InputKeys::D);
 	}
-
-	if(m_velocity.length() > m_maxSpeed)
-	{
-		m_velocity = glm::normalize(m_velocity) * m_maxSpeed;
-	}
-
-	glm::mat4 trans(1);
-	trans = glm::translate(trans, m_position);
-
-	trans = glm::rotate(trans, m_rotation, glm::vec3(0, 1, 0));
-
-	trans = glm::translate(trans, m_velocity * _dt);
-
-	m_position = trans[3].xyz;
-
-	if(m_position.x > 8.5f)
-	{
-		m_position.x = 8.5f;
-		m_velocity.x *= -0.25f;
-	}
-
-	if(m_position.z > 8.5f)
-	{
-		m_position.z = 8.5f;
-		m_velocity.z *= -0.25f;
-	}
-
-	if(m_position.x < -8.5f)
-	{
-		m_position.x = -8.5f;
-		m_velocity.x *= -0.25f;
-	}
-
-	if(m_position.z < -8.5f)
-	{
-		m_position.z = -8.5f;
-		m_velocity.z *= -0.25f;
-	}
-
-	m_position.y = 0.5f + (sin(m_timeSinceSpawn * 3.0f) * 0.05f);
+	
 
 	if(glfwGetMouseButton(m_window, 0))
 	{

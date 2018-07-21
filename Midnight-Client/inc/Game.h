@@ -7,6 +7,7 @@
 #define	_GAME_H_
 #include "gl/gl_core_4_4.h"
 struct GLFWwindow;
+class NetworkManager_Client;
 class GameStateManager;
 
 class Game
@@ -21,13 +22,19 @@ public:
 	//Main Game loop
 	void Run();
 
+private:
+
+	//Function to return DeltaTime
+	double GetDeltaTime();
+
+public:
+
 	const static int k_windowWidth = 1280;
 	const static int k_windowHeight = 800;
 
-protected:
+	inline static NetworkManager_Client* GetNetworkManager() { return m_networkManager;}
+
 private:
-	//Function to return DeltaTime
-	double GetDeltaTime();
 
 	//Variables to calculate Delta Time
 	double currentFrame;
@@ -40,6 +47,8 @@ private:
 	//Game State Manager
 	GameStateManager* m_gameStateManager;
 
+	//Network Manager
+	static NetworkManager_Client* m_networkManager;
 
 };
 

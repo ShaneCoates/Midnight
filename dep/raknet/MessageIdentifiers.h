@@ -56,7 +56,7 @@ enum DefaultMessageIDTypes
 	//
 	/// These types are never returned to the user.
 	/// Ping from a connected system.  Update timestamps (internal use only)
-	ID_CONNECTED_PING,  
+	ID_CONNECTED_PING,
 	/// Ping from an unconnected system.  Reply but do not update timestamps. (internal use only)
 	ID_UNCONNECTED_PING,
 	/// Ping from an unconnected system.  Only reply if we have open connections. Do not update timestamps. (internal use only)
@@ -101,7 +101,7 @@ enum DefaultMessageIDTypes
 	/// message did not arrive (it may or may not have been delivered, probably not). On disconnect or shutdown, you will not get
 	/// ID_SND_RECEIPT_LOSS for unsent messages, you should consider those messages as all lost.
 	ID_SND_RECEIPT_LOSS,
-	
+
 
 	//
 	// USER TYPES - DO NOT CHANGE THESE
@@ -137,7 +137,7 @@ enum DefaultMessageIDTypes
 	/// RakPeer - The sizeof(RakNetTime) bytes following this byte represent a value which is automatically modified by the difference
 	/// in system times between the sender and the recipient. Requires that you call SetOccasionalPing.
 	ID_TIMESTAMP,
-    /// RakPeer - Pong from an unconnected system.  First byte is ID_UNCONNECTED_PONG, second sizeof(RakNet::TimeMS) bytes is the ping,
+	/// RakPeer - Pong from an unconnected system.  First byte is ID_UNCONNECTED_PONG, second sizeof(RakNet::TimeMS) bytes is the ping,
 	/// following bytes is system specific enumeration data.
 	/// Read using bitstreams
 	ID_UNCONNECTED_PONG,
@@ -149,7 +149,7 @@ enum DefaultMessageIDTypes
 	/// partLength (unsigned int), first part data (length <= MAX_MTU_SIZE). See the three parameters partCount, partTotal
 	///  and partLength in OnFileProgress in FileListTransferCBInterface.h
 	ID_DOWNLOAD_PROGRESS,
-	
+
 	/// ConnectionGraph2 plugin - In a client/server environment, a client other than ourselves has disconnected gracefully.
 	///   Packet::systemAddress is modified to reflect the systemAddress of this client.
 	ID_REMOTE_DISCONNECTION_NOTIFICATION,
@@ -168,19 +168,19 @@ enum DefaultMessageIDTypes
 
 	/// DirectoryDeltaTransfer plugin - Request from a remote system for a download of a directory
 	ID_DDT_DOWNLOAD_REQUEST,
-	
+
 	/// RakNetTransport plugin - Transport provider message, used for remote console
 	ID_TRANSPORT_STRING,
 
- 	/// ReplicaManager plugin - Create an object
+	/// ReplicaManager plugin - Create an object
 	ID_REPLICA_MANAGER_CONSTRUCTION,
- 	/// ReplicaManager plugin - Changed scope of an object
- 	ID_REPLICA_MANAGER_SCOPE_CHANGE,
- 	/// ReplicaManager plugin - Serialized data of an object
+	/// ReplicaManager plugin - Changed scope of an object
+	ID_REPLICA_MANAGER_SCOPE_CHANGE,
+	/// ReplicaManager plugin - Serialized data of an object
 	ID_REPLICA_MANAGER_SERIALIZE,
- 	/// ReplicaManager plugin - New connection, about to send all world objects
+	/// ReplicaManager plugin - New connection, about to send all world objects
 	ID_REPLICA_MANAGER_DOWNLOAD_STARTED,
- 	/// ReplicaManager plugin - Finished downloading all serialized objects
+	/// ReplicaManager plugin - Finished downloading all serialized objects
 	ID_REPLICA_MANAGER_DOWNLOAD_COMPLETE,
 
 	/// RakVoice plugin - Open a communication channel
@@ -429,9 +429,19 @@ enum DefaultMessageIDTypes
 	// For the user to use.  Start your first enumeration at this value.
 	ID_USER_PACKET_ENUM,
 	//-------------------------------------------------------------------------------------------------------------
+	ID_STATE_DUMP,
 	ID_SET_PLAYER_NAME,
 	ID_SET_PLAYER_ID,
-	ID_PLAYER_INPUT,
+	ID_PLAYER_INPUT_W_DOWN,
+	ID_PLAYER_INPUT_W_UP,
+	ID_PLAYER_INPUT_S_DOWN,
+	ID_PLAYER_INPUT_S_UP,
+	ID_PLAYER_INPUT_A_DOWN,
+	ID_PLAYER_INPUT_A_UP,
+	ID_PLAYER_INPUT_D_DOWN,
+	ID_PLAYER_INPUT_D_UP,
+	ID_PLAYER_INPUT_ROTATION_DELTA,
+
 };
 
 #endif // RAKNET_USE_CUSTOM_PACKET_IDS

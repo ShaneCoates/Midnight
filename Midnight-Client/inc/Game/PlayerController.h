@@ -44,6 +44,8 @@ private:
 	float m_rotationSpeed = 3.0f;
 	bool m_rightButtonDown = false;
 
+	
+	uint8_t m_inputStates = 0;
 };
 
 #endif

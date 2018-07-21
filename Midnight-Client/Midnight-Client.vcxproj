@@ -161,6 +161,7 @@
     <ClCompile Include="src\Game\ArenaRendererProperties.cpp" />
     <ClCompile Include="src\Game\PlayerController.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Networking\NetworkManager_Client.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Camera\Camera.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="inc\Game\ArenaRenderer.h" />
     <ClInclude Include="inc\Game\ArenaRendererProperties.h" />
     <ClInclude Include="inc\Game\PlayerController.h" />
+    <ClInclude Include="inc\Networking\NetworkManager_Client.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

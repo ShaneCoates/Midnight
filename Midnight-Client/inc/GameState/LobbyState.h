@@ -8,11 +8,11 @@ Description: Test state for shadows
 
 #include "GameState.h"
 #include "imgui\imgui.h"
-#include "RakPeerInterface.h"
-#include "raknet\BitStream.h"
+
 
 struct GLFWwindow;
 class GameStateManager;
+class NetworkManager_Client;
 class LobbyState : public IGameState
 {
 public:
@@ -38,15 +38,12 @@ private:
 	GLFWwindow * m_window;
 	GameStateManager* m_gameStateManager;
 
-	RakNet::RakPeerInterface *m_peerInterface;
-	RakNet::Packet *m_packet;
-	RakNet::BitStream m_bitStream;
+	NetworkManager_Client* m_networkManager;
+
 
 
 	int m_ImGuiWindowFlag = 0;
 	bool m_ImGuiWindowOpen = true;
-
-	bool m_hasConnected = false;
 
 	ImVec2 m_lobbyScreenPos;
 	const ImVec2 k_lobbyScreenSize = ImVec2(250, 500);

@@ -15,8 +15,10 @@
 #include "GameState/GameStateManager.h"
 #include "GameState/MainState.h"
 #include "GameState/LobbyState.h"
-
+#include "Networking/NetworkManager_Client.h"
 #include "Utilities/Debug.h"
+
+NetworkManager_Client* Game::m_networkManager;
 
 Game::Game() 
 {
@@ -53,13 +55,14 @@ Game::Game()
 
 	ImGui::StyleColorsDark();
 
-
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_networkManager = new NetworkManager_Client();
 
 	m_gameStateManager = new GameStateManager();
 	m_gameStateManager->RegisterState("Lobby", new LobbyState(m_gameWindow, m_gameStateManager));
 	m_gameStateManager->RegisterState("Main", new MainState(m_gameWindow, m_gameStateManager));
-	m_gameStateManager->Push("Main");
+	m_gameStateManager->Push("Lobby");
 
 
 }
@@ -89,6 +92,7 @@ void Game::Run() {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		
+		m_networkManager->CheckForPackets();
 		m_gameStateManager->Update(dt);
 		m_gameStateManager->Draw();
 		
