@@ -41,7 +41,7 @@ private:
 		1.0f, 1.0f, 1.0f, 1.0f
 	};
 
-	bool m_MSAA = false;
+	bool m_MSAA = true;
 	bool m_AO = true;
 
 	float m_focalLength = 1.85f;								// Distance between eye and image-plane
